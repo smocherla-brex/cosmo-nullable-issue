@@ -106,3 +106,9 @@ export type Employee = {
 export type _Service = {
   sdl: string;
 };
+
+export type Foo = {
+  __typename: 'Foo';
+  id: number;
+  bar: string;
+}

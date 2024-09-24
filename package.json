@@ -6,6 +6,7 @@
     "services-go": "run-script-os",
     "services-go:default": "cd demos/go && go run cmd/all/main.go",
     "start": "run-script-os",
+    "start-apollo": "ts-node --project router/apollo router/apollo router/apollo/server.ts",
     "start:default": "concurrently \"npm run services\" \"wgc router download-binary; cd ./router && ./router\"",
     "start:win32": "concurrently \"npm run services\" \"wgc router download-binary && cd router && router.exe\"",
     "start-go": "run-script-os",
@@ -17,10 +18,14 @@
   "devDependencies": {
     "@graphql-yoga/node": "^2.13.13",
     "@types/node": "^20.9.3",
-    "run-script-os": "^1.1.6",
-    "typescript": "^5.3.2",
-    "wgc": "latest",
     "concurrently": "^8.2.2",
-    "ts-node": "^10.9.1"
+    "run-script-os": "^1.1.6",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.3.2",
+    "wgc": "latest"
+  },
+  "dependencies": {
+    "@apollo/gateway": "2.3.2",
+    "@apollo/server": "^4.11.0"
   }
 }

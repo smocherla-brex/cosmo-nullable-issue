@@ -5,6 +5,11 @@ type Query {
   products: [Products!]!
   _entities(representations: [_Any!]!): [_Entity]
   _service: _Service
+  foo: Foo!
+}
+
+type Foo @key(fields: "id") {
+  id: Int!
 }
 
 type Subscription {
@@ -110,7 +115,7 @@ type SDK implements IProduct @key(fields: "upc") {
   owner: Employee!
 }
 
-union _Entity = Consultancy | Cosmo | Employee | SDK
+union _Entity = Consultancy | Cosmo | Employee | SDK | Foo
 
 scalar _Any
 

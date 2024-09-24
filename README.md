@@ -1,41 +1,99 @@
-# cosmo-federation-demos
+## Example to illustrate difference between cosmo and apollo on strictness regarding nullable field of types which have non-nullable fields
 
-This repository contains a demo of [WunderGraph Cosmo](https://cosmo-docs.wundergraph.com/) Federation capabilities. It showcases to implement subgraphs in TypeScript and Go and how to compose them into a federated graph.
-It uses the command-line [`wgc`](https://cosmo-docs.wundergraph.com/cli/intro) to compose a federated schema from multiple subgraphs and the [`Cosmo Router`](https://cosmo-docs.wundergraph.com/router) to run the Federated Graph.
+This repository encompasses reproduction of an issue that illustrates a difference between the apollo and cosmo implementations of the GraphQL router
+with regards to handling nullable fields with non-nullable fields in their types.
 
-## Getting started
+This example was built on top of the [cosmo-federation-demos](https://github.com/wundergraph/cosmo-federation-demos) repository.
 
-We made it easy to get started with the demo. Just follow the steps below.
+A new entity type `Foo` is added to both the `employees` and `family` subgraph
+```graphql
+# in employees
+type Foo @key(fields: "id") {
+    id: Int!
+}
 
-## Prerequisites
-1. Install the dependencies `npm install`
-
-### Running the demo with TypeScript Subgraphs
-
-```bash
-npm start
+# in family
+type Foo @key(fields: "id") {
+    id: Int!
+    message: String!
+}
 ```
 
-Finally, go to [http://localhost:3002](http://localhost:3002) and try out the example query [`./example-queries.graphql`](./example-queries.graphql)!
+The entity `Foo` has two non-nullable fields. With the above example, the following query behaves differently with `cosmo` and `apollo-gateway` routers
 
-### Using Go Subgraphs
 
-You can also run subgraphs in Go. To do so, you need to have the [Go toolchain installed](https://go.dev/doc/install).
-
-```bash
-npm start-go
+```graphql
+query {
+ 	foo {
+        id
+        message
+    }
+}
 ```
 
-### Generating the router configuration (optional)
+With apollo-gateway, we get
 
-You can update the subgraph schemas and regenerate the router configuration by running:
-
-```bash
-npm run compose
-# or
-npm run compose-go
+```json
+{
+  "data": null,
+  "extensions": {
+    "valueCompletion": [
+      {
+        "message": "Cannot return null for non-nullable field Foo.message.",
+        "path": [
+          "foo",
+          "message"
+        ],
+        "extensions": {
+          "code": "INVALID_GRAPHQL"
+        }
+      }
+    ]
+  }
+}
 ```
 
-This will require a restart of the router so press `CTRL+C` and run `npm start` again.
+and 
 
-💫 If you would like to learn more about federation, check out the [WunderGraph Cosmo Documentation](https://cosmo-docs.wundergraph.com/)!
+```json
+{
+  "errors": [
+    {
+      "message": "Failed to fetch from Subgraph 'family' at Path 'foo', Reason: no data or errors in response.",
+      "extensions": {
+        "statusCode": 200
+      }
+    },
+    {
+      "message": "Cannot return null for non-nullable field 'Query.foo.message'.",
+      "path": [
+        "foo",
+        "message"
+      ]
+    }
+  ],
+  "data": null,
+```
+
+One of the subgraphs (`employees`) returns a non-null `Foo` entity in the `_entities` resolver but in the `family` subgraph it resolves to `null`. The `message` field on `Foo` type is non-nullable
+which is what `Cannot return null for non-nullable field` refers to. In `apollo-gateway` (and `apollo-router`), this has been enforced as such as described [here](https://github.com/apollographql/federation/issues/2374).
+
+
+# Running locally
+
+Make sure you have `node`, `npm` and `ts-node` installed.
+
+Run the below to start the cosmo router with all the subgraphs
+```bash
+DEV_MODE=true npm start
+```
+
+Then separately run the below 
+```bash
+ts-node router/apollo/server.ts
+```
+
+to start the apollo-gateway server which talks to the same subgraphs as the cosmo router.
+
+Now, you can go to `http://localhost:4000` to run queries against the apollo sandbox and 
+`http://localhost:3002` as the playground and run the above query. You'll observe the difference.

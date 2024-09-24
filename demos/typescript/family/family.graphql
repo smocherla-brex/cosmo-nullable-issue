@@ -101,6 +101,11 @@ type Employee @key(fields: "id") {
   id: Int!
 }
 
+type Foo @key(fields: "id") {
+  id: Int!
+  message: String!
+}
+
 input SearchInput {
   hasPets: Boolean
   nationality: Nationality
@@ -112,7 +117,7 @@ input NestedSearchInput {
   hasChildren: Boolean
 }
 
-union _Entity = Employee
+union _Entity = Employee | Foo
 
 scalar _Any
 

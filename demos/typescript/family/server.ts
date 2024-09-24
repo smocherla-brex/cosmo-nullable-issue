@@ -2,7 +2,7 @@ import { createServer } from '@graphql-yoga/node';
 import { readFileSync } from 'node:fs';
 import * as path from 'node:path';
 import { baseSchema } from '../utils';
-import { _Service, Employee, Pet, SearchInput } from './types';
+import { _Service, Employee, Pet, SearchInput, Foo } from './types';
 import { employees } from './data';
 
 const port = 4002;
@@ -82,8 +82,8 @@ const resolvers = {
       }
       return output;
     },
-    _entities(_: any, args: { representations: any[] }): Employee[] | null {
-      const output: Employee[] = [];
+    _entities(_: any, args: { representations: any[] }): (Employee| Foo | null)[] | null {
+      const output: (Employee | Foo | null)[] = [];
       for (const representation of args.representations) {
         switch (representation.__typename) {
           case 'Employee':
@@ -93,6 +93,9 @@ const resolvers = {
                 break;
               }
             }
+            break;
+          case 'Foo':
+            output.push(null);
             break;
         }
       }

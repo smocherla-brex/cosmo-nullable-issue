@@ -1,8 +1,8 @@
 import { createServer } from '@graphql-yoga/node';
 import { readFileSync } from 'node:fs';
 import * as path from 'node:path';
-import { consultancy, cosmo, employees, engineers, marketers, operators, products, sdk } from './data';
-import { _Entity, _Service, Consultancy, Cosmo, Department, Employee, Product, RoleType, SDK } from './types';
+import { consultancy, cosmo, employees, engineers, foo, marketers, operators, products, sdk } from './data';
+import { _Entity, _Service, Consultancy, Cosmo, Department, Employee, Foo, Product, RoleType, SDK } from './types';
 import { baseSchema } from '../utils';
 
 const port = 4001;
@@ -87,6 +87,9 @@ const resolvers = {
       }
       return null;
     },
+    foo: (): Foo => {
+      return foo;
+    },
     employees: (): Employee[] => {
       return employees;
     },
@@ -124,6 +127,9 @@ const resolvers = {
           case 'SDK':
             output.push(sdk);
             break;
+          case 'Foo':
+            output.push(foo);
+            break
         }
       }
       return output.length > 0 ? output : null;

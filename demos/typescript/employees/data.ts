@@ -1,4 +1,4 @@
-import { Consultancy, Cosmo, Country, Department, Employee, EngineerType, OperationType, Product, SDK } from './types';
+import { Consultancy, Cosmo, Country, Department, Employee, EngineerType, Foo, OperationType, Product, SDK } from './types';
 
 export const employees: Employee[] = [
   {
@@ -191,5 +191,10 @@ export const sdk: SDK = {
   engineers,
   owner: employees[0],
 };
+
+export const foo: Foo = {
+  __typename: 'Foo',
+  id: 1,
+}
 
 export const products: Product[] = [consultancy, cosmo, sdk];

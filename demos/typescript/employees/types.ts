@@ -81,8 +81,13 @@ export type SDK = {
 
 export type Product = Consultancy | Cosmo | SDK;
 
-export type _Entity = Consultancy | Cosmo | Employee | SDK;
+export type _Entity = Consultancy | Cosmo | Employee | SDK | Foo;
 
 export type _Service = {
   sdl: string;
 };
+
+export type Foo = {
+  __typename: 'Foo';
+  id: number;
+}
